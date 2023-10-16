@@ -1,130 +1,104 @@
-package com.rums.gestures_example.gestures;
+package com.rums.gestures_example.gestures
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.View.OnTouchListener;
-import com.rums.gestures_example.math.Vector2D;
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Matrix
+import android.graphics.Paint
+import android.view.MotionEvent
+import android.view.View
+import android.view.View.OnTouchListener
+import com.rums.gestures_example.math.Vector2D
+import com.rums.gestures_example.math.Vector2D.Companion.getSignedAngleBetween
 
+class SandboxView(context: Context?, private val bitmap: Bitmap) : View(context), OnTouchListener {
+    private val width: Int
+    private val height: Int
+    private val transform = Matrix()
+    private val position = Vector2D()
+    private var scale = 1f
+    private var angle = 0f
+    private val touchManager = TouchManager(2)
+    private var isInitialized = false
 
-public class SandboxView extends View implements OnTouchListener {
+    // Debug helpers to draw lines between the two touch points
+    private var vca: Vector2D? = null
+    private var vcb: Vector2D? = null
+    private var vpa: Vector2D? = null
+    private var vpb: Vector2D? = null
 
-	private final Bitmap bitmap;
-	private final int width;
-	private final int height;
-	private Matrix transform = new Matrix();
+    init {
+        width = bitmap.width
+        height = bitmap.height
+        setOnTouchListener(this)
+    }
 
-	private Vector2D position = new Vector2D();
-	private float scale = 1;
-	private float angle = 0;
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        if (!isInitialized) {
+            val w = getWidth()
+            val h = getHeight()
+            position[(w / 2).toFloat()] = (h / 2).toFloat()
+            isInitialized = true
+        }
+        val paint = Paint()
+        transform.reset()
+        transform.postTranslate(-width / 2.0f, -height / 2.0f)
+        transform.postRotate(getDegreesFromRadians(angle))
+        transform.postScale(scale, scale)
+        transform.postTranslate(position.x, position.y)
+        canvas.drawBitmap(bitmap, transform, paint)
+        try {
+            paint.color = -0xff8100
+            canvas.drawCircle(vca!!.x, vca!!.y, 64f, paint)
+            paint.color = -0x810000
+            canvas.drawCircle(vcb!!.x, vcb!!.y, 64f, paint)
+            paint.color = -0x10000
+            canvas.drawLine(vpa!!.x, vpa!!.y, vpb!!.x, vpb!!.y, paint)
+            paint.color = -0xff0100
+            canvas.drawLine(vca!!.x, vca!!.y, vcb!!.x, vcb!!.y, paint)
+        } catch (e: NullPointerException) {
+            // Just being lazy here...
+        }
+    }
 
-	private TouchManager touchManager = new TouchManager(2);
-	private boolean isInitialized = false;
+    override fun onTouch(v: View, event: MotionEvent): Boolean {
+        vca = null
+        vcb = null
+        vpa = null
+        vpb = null
+        try {
+            touchManager.update(event)
+            if (touchManager.pressCount == 1) {
+                vca = touchManager.getPoint(0)
+                vpa = touchManager.getPreviousPoint(0)
+                position.add(touchManager.moveDelta(0))
+            } else {
+                if (touchManager.pressCount == 2) {
+                    vca = touchManager.getPoint(0)
+                    vpa = touchManager.getPreviousPoint(0)
+                    vcb = touchManager.getPoint(1)
+                    vpb = touchManager.getPreviousPoint(1)
+                    val current = touchManager.getVector(0, 1)
+                    val previous = touchManager.getPreviousVector(0, 1)
+                    val currentDistance = current.length
+                    val previousDistance = previous.length
+                    if (previousDistance != 0f) {
+                        scale *= currentDistance / previousDistance
+                    }
+                    angle -= getSignedAngleBetween(current, previous)
+                }
+            }
+            invalidate()
+        } catch (t: Throwable) {
+            // So lazy...
+        }
+        return true
+    }
 
-	// Debug helpers to draw lines between the two touch points
-	private Vector2D vca = null;
-	private Vector2D vcb = null;
-	private Vector2D vpa = null;
-	private Vector2D vpb = null;
-
-	public SandboxView(Context context, Bitmap bitmap) {
-		super(context);
-
-		this.bitmap = bitmap;
-		this.width = bitmap.getWidth();
-		this.height = bitmap.getHeight();
-
-		setOnTouchListener(this);
-	}
-
-
-	private static float getDegreesFromRadians(float angle) {
-		return (float)(angle * 180.0 / Math.PI);
-	}
-
-	@Override
-	protected void onDraw(Canvas canvas) {
-		super.onDraw(canvas);
-
-		if (!isInitialized) {
-			int w = getWidth();
-			int h = getHeight();
-			position.set(w / 2, h / 2);
-			isInitialized = true;
-		}
-
-		Paint paint = new Paint();
-
-		transform.reset();
-		transform.postTranslate(-width / 2.0f, -height / 2.0f);
-		transform.postRotate(getDegreesFromRadians(angle));
-		transform.postScale(scale, scale);
-		transform.postTranslate(position.getX(), position.getY());
-
-		canvas.drawBitmap(bitmap, transform, paint);
-
-		try {
-			paint.setColor(0xFF007F00);
-			canvas.drawCircle(vca.getX(), vca.getY(), 64, paint);
-			paint.setColor(0xFF7F0000);
-			canvas.drawCircle(vcb.getX(), vcb.getY(), 64, paint);
-
-			paint.setColor(0xFFFF0000);
-			canvas.drawLine(vpa.getX(), vpa.getY(), vpb.getX(), vpb.getY(), paint);
-			paint.setColor(0xFF00FF00);
-			canvas.drawLine(vca.getX(), vca.getY(), vcb.getX(), vcb.getY(), paint);
-		}
-		catch(NullPointerException e) {
-			// Just being lazy here...
-		}
-	}
-
-
-	@Override
-	public boolean onTouch(View v, MotionEvent event) {
-		vca = null;
-		vcb = null;
-		vpa = null;
-		vpb = null;
-
-		try {
-			touchManager.update(event);
-
-			if (touchManager.getPressCount() == 1) {
-				vca = touchManager.getPoint(0);
-				vpa = touchManager.getPreviousPoint(0);
-				position.add(touchManager.moveDelta(0));
-			}
-			else {
-				if (touchManager.getPressCount() == 2) {
-					vca = touchManager.getPoint(0);
-					vpa = touchManager.getPreviousPoint(0);
-					vcb = touchManager.getPoint(1);
-					vpb = touchManager.getPreviousPoint(1);
-
-					Vector2D current = touchManager.getVector(0, 1);
-					Vector2D previous = touchManager.getPreviousVector(0, 1);
-					float currentDistance = current.getLength();
-					float previousDistance = previous.getLength();
-
-					if (previousDistance != 0) {
-						scale *= currentDistance / previousDistance;
-					}
-
-					angle -= Vector2D.getSignedAngleBetween(current, previous);
-				}
-			}
-
-			invalidate();
-		}
-		catch(Throwable t) {
-			// So lazy...
-		}
-		return true;
-	}
-
+    companion object {
+        private fun getDegreesFromRadians(angle: Float): Float {
+            return (angle * 180.0 / Math.PI).toFloat()
+        }
+    }
 }

@@ -1,80 +1,71 @@
-package com.rums.gestures_example.math;
+package com.rums.gestures_example.math
 
-public class Vector2D {
+class Vector2D {
+    var x = 0f
+        private set
+    var y = 0f
+        private set
 
-	private float x;
-	private float y;
+    constructor()
+    constructor(v: Vector2D) {
+        x = v.x
+        y = v.y
+    }
 
-	public Vector2D() {
-	}
+    constructor(x: Float, y: Float) {
+        this.x = x
+        this.y = y
+    }
 
-	public Vector2D(Vector2D v) {
-		this.x = v.x;
-		this.y = v.y;
-	}
+    val length: Float
+        get() = Math.sqrt((x * x + y * y).toDouble()).toFloat()
 
-	public Vector2D(float x, float y) {
-		this.x = x;
-		this.y = y;
-	}
+    fun set(other: Vector2D): Vector2D {
+        x = other.x
+        y = other.y
+        return this
+    }
 
-	public float getX() {
-		return x;
-	}
+    operator fun set(x: Float, y: Float): Vector2D {
+        this.x = x
+        this.y = y
+        return this
+    }
 
-	public float getY() {
-		return y;
-	}
+    fun add(value: Vector2D): Vector2D {
+        x += value.x
+        y += value.y
+        return this
+    }
 
-	public float getLength() {
-		return (float)Math.sqrt(x * x + y * y);
-	}
+    override fun toString(): String {
+        return String.format("(%.4f, %.4f)", x, y)
+    }
 
-	public Vector2D set(Vector2D other) {
-		x = other.getX();
-		y = other.getY();
-		return this;
-	}
+    companion object {
+        @JvmStatic
+        fun subtract(lhs: Vector2D, rhs: Vector2D): Vector2D {
+            return Vector2D(lhs.x - rhs.x, lhs.y - rhs.y)
+        }
 
-	public Vector2D set(float x, float y) {
-		this.x = x;
-		this.y = y;
-		return this;
-	}
+        fun getDistance(lhs: Vector2D, rhs: Vector2D): Float {
+            val delta = subtract(lhs, rhs)
+            return delta.length
+        }
 
-	public Vector2D add(Vector2D value) {
-		this.x += value.getX();
-		this.y += value.getY();
-		return this;
-	}
+        @JvmStatic
+        fun getSignedAngleBetween(a: Vector2D, b: Vector2D): Float {
+            val na = getNormalized(a)
+            val nb = getNormalized(b)
+            return (Math.atan2(nb.y.toDouble(), nb.x.toDouble()) - Math.atan2(
+                na.y.toDouble(),
+                na.x.toDouble()
+            )).toFloat()
+        }
 
-	public static Vector2D subtract(Vector2D lhs, Vector2D rhs) {
-		return new Vector2D(lhs.x - rhs.x, lhs.y - rhs.y);
-	}
-
-	public static float getDistance(Vector2D lhs, Vector2D rhs) {
-		Vector2D delta = Vector2D.subtract(lhs, rhs);
-		return delta.getLength();
-	}
-
-	public static float getSignedAngleBetween(Vector2D a, Vector2D b) {
-		Vector2D na = getNormalized(a);
-		Vector2D nb = getNormalized(b);
-
-		return (float)(Math.atan2(nb.y, nb.x) - Math.atan2(na.y, na.x));
-	}
-
-	public static Vector2D getNormalized(Vector2D v) {
-		float l = v.getLength();
-		if (l == 0)
-			return new Vector2D();
-		else
-			return new Vector2D(v.x / l, v.y / l);
-
-	}
-
-	@Override
-	public String toString() {
-		return String.format("(%.4f, %.4f)", x, y);
-	}
+        fun getNormalized(v: Vector2D): Vector2D {
+            val l = v.length
+            return if (l == 0f) Vector2D() else Vector2D(v.x / l, v.y / l)
+        }
+    }
 }

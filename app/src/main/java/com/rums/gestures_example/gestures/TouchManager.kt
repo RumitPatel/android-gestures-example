@@ -1,107 +1,92 @@
-package com.rums.gestures_example.gestures;
+package com.rums.gestures_example.gestures
 
-import android.view.MotionEvent;
+import android.view.MotionEvent
+import com.rums.gestures_example.math.Vector2D
+import com.rums.gestures_example.math.Vector2D.Companion.subtract
 
-import com.rums.gestures_example.math.Vector2D;
+class TouchManager(private val maxNumberOfTouchPoints: Int) {
+    private val points: Array<Vector2D?>
+    private val previousPoints: Array<Vector2D?>
 
+    init {
+        points = arrayOfNulls(maxNumberOfTouchPoints)
+        previousPoints = arrayOfNulls(maxNumberOfTouchPoints)
+    }
 
-public class TouchManager {
+    fun isPressed(index: Int): Boolean {
+        return points[index] != null
+    }
 
-	private final int maxNumberOfTouchPoints;
+    val pressCount: Int
+        get() {
+            var count = 0
+            for (point in points) {
+                if (point != null) ++count
+            }
+            return count
+        }
 
-	private final Vector2D[] points;
-	private final Vector2D[] previousPoints;
+    fun moveDelta(index: Int): Vector2D {
+        return if (isPressed(index)) {
+            val previous =
+                if (previousPoints[index] != null) previousPoints[index] else points[index]
+            subtract(points[index]!!, previous!!)
+        } else {
+            Vector2D()
+        }
+    }
 
-	public TouchManager(final int maxNumberOfTouchPoints) {
-		this.maxNumberOfTouchPoints = maxNumberOfTouchPoints;
+    fun getPoint(index: Int): Vector2D? {
+        return if (points[index] != null) points[index] else Vector2D()
+    }
 
-		points = new Vector2D[maxNumberOfTouchPoints];
-		previousPoints = new Vector2D[maxNumberOfTouchPoints];
-	}
+    fun getPreviousPoint(index: Int): Vector2D? {
+        return if (previousPoints[index] != null) previousPoints[index] else Vector2D()
+    }
 
-	public boolean isPressed(int index) {
-		return points[index] != null;
-	}
+    fun getVector(indexA: Int, indexB: Int): Vector2D {
+        return getVector(points[indexA], points[indexB])
+    }
 
-	public int getPressCount() {
-		int count = 0;
-		for(Vector2D point : points) {
-			if (point != null)
-				++count;
-		}
-		return count;
-	}
+    fun getPreviousVector(indexA: Int, indexB: Int): Vector2D {
+        return if (previousPoints[indexA] == null || previousPoints[indexB] == null) getVector(
+            points[indexA],
+            points[indexB]
+        ) else getVector(previousPoints[indexA], previousPoints[indexB])
+    }
 
-	public Vector2D moveDelta(int index) {
+    fun update(event: MotionEvent) {
+        val actionCode = event.action and MotionEvent.ACTION_MASK
+        if (actionCode == MotionEvent.ACTION_POINTER_UP || actionCode == MotionEvent.ACTION_UP) {
+            val index = event.action shr MotionEvent.ACTION_POINTER_ID_SHIFT
+            points[index] = null
+            previousPoints[index] = points[index]
+        } else {
+            for (i in 0 until maxNumberOfTouchPoints) {
+                if (i < event.pointerCount) {
+                    val index = event.getPointerId(i)
+                    val newPoint = Vector2D(event.getX(i), event.getY(i))
+                    if (points[index] == null) points[index] = newPoint else {
+                        if (previousPoints[index] != null) {
+                            previousPoints[index]!!.set(points[index]!!)
+                        } else {
+                            previousPoints[index] = Vector2D(newPoint)
+                        }
+                        if (subtract(points[index]!!, newPoint).length < 64) points[index]!!
+                            .set(newPoint)
+                    }
+                } else {
+                    points[i] = null
+                    previousPoints[i] = points[i]
+                }
+            }
+        }
+    }
 
-		if (isPressed(index)) {
-			Vector2D previous = previousPoints[index] != null ? previousPoints[index] : points[index];
-			return Vector2D.subtract(points[index], previous);
-		}
-		else {
-			return new Vector2D();
-		}
-	}
-
-	private static Vector2D getVector(Vector2D a, Vector2D b) {
-		if (a == null || b == null)
-			throw new RuntimeException("can't do this on nulls");
-
-		return Vector2D.subtract(b, a);
-	}
-
-	public Vector2D getPoint(int index) {
-		return points[index] != null ? points[index] : new Vector2D();
-	}
-
-	public Vector2D getPreviousPoint(int index) {
-		return previousPoints[index] != null ? previousPoints[index] : new Vector2D();
-	}
-
-	public Vector2D getVector(int indexA, int indexB) {
-		return getVector(points[indexA], points[indexB]);
-	}
-
-	public Vector2D getPreviousVector(int indexA, int indexB) {
-		if (previousPoints[indexA] == null || previousPoints[indexB] == null)
-			return getVector(points[indexA], points[indexB]);
-		else
-			return getVector(previousPoints[indexA], previousPoints[indexB]);
-	}
-
-	public void update(MotionEvent event) {
-	   int actionCode = event.getAction() & MotionEvent.ACTION_MASK;
-
-	   if (actionCode == MotionEvent.ACTION_POINTER_UP || actionCode == MotionEvent.ACTION_UP) {
-		   int index = event.getAction() >> MotionEvent.ACTION_POINTER_ID_SHIFT;
-		   previousPoints[index] = points[index] = null;
-	   }
-	   else {
-			for(int i = 0; i < maxNumberOfTouchPoints; ++i) {
-				if (i < event.getPointerCount()) {
-					int index = event.getPointerId(i);
-
-					Vector2D newPoint = new Vector2D(event.getX(i), event.getY(i));
-
-					if (points[index] == null)
-						points[index] = newPoint;
-					else {
-						if (previousPoints[index] != null) {
-							previousPoints[index].set(points[index]);
-						}
-						else {
-							previousPoints[index] = new Vector2D(newPoint);
-
-						}
-
-						if (Vector2D.subtract(points[index], newPoint).getLength() < 64)
-							points[index].set(newPoint);
-					}
-				}
-				else {
-				   previousPoints[i] = points[i] = null;
-				}
-			}
-	   }
-	}
+    companion object {
+        private fun getVector(a: Vector2D?, b: Vector2D?): Vector2D {
+            if (a == null || b == null) throw RuntimeException("can't do this on nulls")
+            return subtract(b, a)
+        }
+    }
 }

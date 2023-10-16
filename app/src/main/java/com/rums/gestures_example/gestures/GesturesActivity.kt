@@ -1,22 +1,16 @@
-package com.rums.gestures_example.gestures;
+package com.rums.gestures_example.gestures
 
-import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.Bundle;
-import android.view.View;
+import android.app.Activity
+import android.graphics.BitmapFactory
+import android.os.Bundle
+import android.view.View
+import com.rums.gestures_example.R
 
-import com.rums.gestures_example.R;
-
-public class GesturesActivity extends Activity {
-
-	@Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.advert);
-        View view = new SandboxView(this, bitmap);
-
-        setContentView(view);
+class GesturesActivity : Activity() {
+    public override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.advert)
+        val view: View = SandboxView(this, bitmap)
+        setContentView(view)
     }
 }
