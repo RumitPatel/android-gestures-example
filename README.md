@@ -3,7 +3,7 @@ This project is an example to implement different gestures like pinch zoom, drag
 
 ## Output:
 
-![Gesture example output](https://github.com/RumitPatel/android-gestures-example/blob/main/demo_images/android-gestures-demo.gif)
+![Gesture example output](https://github.com/RumitPatel/android-gestures-example/blob/feature/development/demo_images/android-gestures-demo.gif)
 
 ## Thanks:
 
