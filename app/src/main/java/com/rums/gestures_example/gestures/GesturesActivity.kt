@@ -9,8 +9,10 @@ import com.rums.gestures_example.R
 class GesturesActivity : Activity() {
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.advert)
+/*        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.scal)
         val view: View = SandboxView(this, bitmap = bitmap)
-        setContentView(view)
+        setContentView(view)*/
+
+        setContentView(R.layout.activity_main)
     }
 }

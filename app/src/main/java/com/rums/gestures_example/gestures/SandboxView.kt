@@ -2,6 +2,7 @@ package com.rums.gestures_example.gestures
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Matrix
 import android.graphics.Paint
@@ -9,6 +10,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
+import com.rums.gestures_example.R
 import com.rums.gestures_example.math.Vector2D
 import com.rums.gestures_example.math.Vector2D.Companion.getSignedAngleBetween
 
@@ -16,8 +18,10 @@ class SandboxView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-    private val bitmap: Bitmap? = null,
+//    private val bitmap: Bitmap? = null,
 ) : View(context, attrs, defStyleAttr), OnTouchListener {
+    val bitmap = BitmapFactory.decodeResource(resources, R.drawable.scal)
+
     private val width: Int = bitmap?.width ?: 0
     private val height: Int = bitmap?.height ?: 0
     private val transform = Matrix()

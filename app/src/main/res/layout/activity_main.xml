@@ -4,5 +4,20 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/temp_cell_demo" />
+
+        <com.rums.gestures_example.gestures.SandboxView
+            android:id="@+id/sandboxView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
 
 </LinearLayout>
