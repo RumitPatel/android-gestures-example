@@ -1,4 +1,4 @@
-package com.rums.canvas_example.math;
+package com.rums.gestures_example.math;
 
 public class Vector2D {
 

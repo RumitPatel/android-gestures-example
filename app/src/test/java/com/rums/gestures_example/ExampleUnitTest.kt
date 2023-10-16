@@ -1,4 +1,4 @@
-package com.rums.canvas_example
+package com.rums.gestures_example
 
 import org.junit.Test
 

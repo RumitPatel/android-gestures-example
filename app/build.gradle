@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.rums.canvas_example'
+    namespace 'com.rums.gestures_example'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.rums.canvas_example"
+        applicationId "com.rums.gestures_example"
         minSdk 26
         targetSdk 34
         versionCode 1

@@ -1,7 +1,4 @@
 <resources>
     <string name="app_name">Gesture example</string>
 
-    <string name="undo">Undo</string>
-    <string name="redo">Redo</string>
-    <string name="clear">Clear</string>
 </resources>

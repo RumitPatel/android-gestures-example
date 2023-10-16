@@ -1,4 +1,4 @@
-package com.rums.canvas_example.gestures;
+package com.rums.gestures_example.gestures;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -6,7 +6,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 
-import com.rums.canvas_example.R;
+import com.rums.gestures_example.R;
 
 public class GesturesActivity extends Activity {
 
