@@ -1,8 +1,8 @@
-package com.rums.canvas_example.gestures;
+package com.rums.gestures_example.gestures;
 
 import android.view.MotionEvent;
 
-import com.rums.canvas_example.math.Vector2D;
+import com.rums.gestures_example.math.Vector2D;
 
 
 public class TouchManager {
