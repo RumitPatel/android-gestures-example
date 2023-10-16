@@ -5,15 +5,21 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Matrix
 import android.graphics.Paint
+import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
 import com.rums.gestures_example.math.Vector2D
 import com.rums.gestures_example.math.Vector2D.Companion.getSignedAngleBetween
 
-class SandboxView(context: Context?, private val bitmap: Bitmap) : View(context), OnTouchListener {
-    private val width: Int
-    private val height: Int
+class SandboxView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0,
+    private val bitmap: Bitmap? = null,
+) : View(context, attrs, defStyleAttr), OnTouchListener {
+    private val width: Int = bitmap?.width ?: 0
+    private val height: Int = bitmap?.height ?: 0
     private val transform = Matrix()
     private val position = Vector2D()
     private var scale = 1f
@@ -27,10 +33,12 @@ class SandboxView(context: Context?, private val bitmap: Bitmap) : View(context)
     private var vpa: Vector2D? = null
     private var vpb: Vector2D? = null
 
+    private var paint: Paint
+
     init {
-        width = bitmap.width
-        height = bitmap.height
         setOnTouchListener(this)
+
+        paint = Paint()
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -41,13 +49,15 @@ class SandboxView(context: Context?, private val bitmap: Bitmap) : View(context)
             position[(w / 2).toFloat()] = (h / 2).toFloat()
             isInitialized = true
         }
-        val paint = Paint()
+
         transform.reset()
         transform.postTranslate(-width / 2.0f, -height / 2.0f)
         transform.postRotate(getDegreesFromRadians(angle))
         transform.postScale(scale, scale)
         transform.postTranslate(position.x, position.y)
-        canvas.drawBitmap(bitmap, transform, paint)
+        if (bitmap != null) {
+            canvas.drawBitmap(bitmap, transform, paint)
+        }
         try {
             paint.color = -0xff8100
             canvas.drawCircle(vca!!.x, vca!!.y, 64f, paint)

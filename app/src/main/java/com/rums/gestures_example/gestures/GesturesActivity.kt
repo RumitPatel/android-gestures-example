@@ -10,7 +10,7 @@ class GesturesActivity : Activity() {
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val bitmap = BitmapFactory.decodeResource(resources, R.drawable.advert)
-        val view: View = SandboxView(this, bitmap)
+        val view: View = SandboxView(this, bitmap = bitmap)
         setContentView(view)
     }
 }
