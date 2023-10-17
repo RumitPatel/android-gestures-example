@@ -20,7 +20,7 @@ class SandboxView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 //    private val bitmap: Bitmap? = null,
 ) : View(context, attrs, defStyleAttr), OnTouchListener {
-    val bitmap = BitmapFactory.decodeResource(resources, R.drawable.ruler_1)
+    val bitmap = BitmapFactory.decodeResource(resources, R.drawable.ruler_2)
 
     private val width: Int = bitmap?.width ?: 0
     private val height: Int = bitmap?.height ?: 0
